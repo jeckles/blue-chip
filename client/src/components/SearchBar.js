@@ -25,6 +25,25 @@ const CssTextField = withStyles({
     },
   })(TextField);
 
+const getStock = async ticker => {
+  console.log("Getting data...");
+  const request = await fetch("/stock", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        ticker: ticker,
+        type: "daily"
+      })
+    });
+  
+  const data = await request.json();
+  console.log("WE HAVE RECEIVEDDDD DATA!");
+  console.log(data);
+  return data;
+};
+
 class SearchBar extends React.Component {
     constructor(props) {
         super(props);
@@ -59,18 +78,16 @@ class SearchBar extends React.Component {
     }
 
     onEnterSearch(e) {
-      fetch("/api")
-        .then((res) => res.json())
-        .then((data) => this.setState({ data: data.message }))
-        .finally(() => {
-          if (e.key === "Enter") {
-            if (this.state.searching === true) {
-                this.setState({ searching: false, ticker: [this.state.data] });
-            } else {
-                this.setState({ searching: true, ticker: [this.state.data] });
-            }
-          }
-      });
+      if (e.key === "Enter") {
+        const data = getStock(e.target.value);
+        console.log("made it here!");
+        console.log(data);
+        if (this.state.searching === true) {
+          this.setState({ searching: false, ticker: [data] });
+        } else {
+          this.setState({ searching: true, ticker: [data] });
+        }
+      }
     }
 }
 
