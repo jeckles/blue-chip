@@ -1,0 +1,11 @@
+.title {
+    color: #61dafb;
+    text-align: center;
+    margin: 0;
+    letter-spacing: 0.01em;
+    font-size: 30px;
+}
+
+.searchBar {
+    color: white;
+}
