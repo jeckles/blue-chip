@@ -1,4 +1,4 @@
-import React, { Component, useEffect } from 'react';
+import React from 'react';
 import TextField from "@mui/material/TextField";
 import { withStyles } from '@material-ui/styles'; 
 import './SearchBar.css';
@@ -25,8 +25,25 @@ const CssTextField = withStyles({
     },
   })(TextField);
 
-const getStock = async ticker => {
-  console.log("Getting data...");
+  const getStock = async ticker => {
+    console.log(`getting stock data for ${ticker}`);
+    const request = await fetch("/stock", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          ticker: ticker,
+          type: "daily"
+        })
+      });
+    
+    const data = await request.json();
+    return data;
+  };
+
+const getStockEarnings = async ticker => {
+  console.log(`getting stock earnings for ${ticker}`);
   const request = await fetch("/stock", {
       method: "POST",
       headers: {
@@ -34,20 +51,18 @@ const getStock = async ticker => {
       },
       body: JSON.stringify({
         ticker: ticker,
-        type: "daily"
-      })
+        type: "earnings"
+      })  
     });
-  
-  const data = await request.json();
-  console.log("WE HAVE RECEIVEDDDD DATA!");
-  console.log(data);
-  return data;
+
+    const data = await request.json();
+    return data;
 };
 
 class SearchBar extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { text: '', searching: false, ticker: [], data: '' };
+        this.state = { text: '', searching: false, ticker: [], stockData: {}, stockEarnings: {} };
         this.handleChange = this.handleChange.bind(this);
         this.onEnterSearch = this.onEnterSearch.bind(this);
     }
@@ -55,7 +70,7 @@ class SearchBar extends React.Component {
     render() {
         return (
             <div className="main">
-                <h1 className="title">Blue Chip</h1>
+                <h1 className="title font-bold">BlueChip</h1>
                 <div className="searchBar">
                     <CssTextField      
                         label="enter a ticker..."
@@ -67,7 +82,7 @@ class SearchBar extends React.Component {
                         onChange={this.handleChange}
                         onKeyDown={this.onEnterSearch}
                     />
-                    { <StockInfoBox ticker={this.state.ticker}/> }
+                    <StockDataBox stockData={this.state.stockData} stockEarnings={this.state.stockEarnings} />
                 </div>
             </div>
         );
@@ -77,22 +92,31 @@ class SearchBar extends React.Component {
         this.setState({ text: e.target.value });
     }
 
-    onEnterSearch(e) {
+    async onEnterSearch(e) {
       if (e.key === "Enter") {
-        const data = getStock(e.target.value);
-        console.log("made it here!");
-        console.log(data);
+       
+        await getStock(e.target.value)
+        .then((res) => {
+          this.setState({ stockData: res })
+        });
+
+        await getStockEarnings(e.target.value)
+        .then((res) => {
+          this.setState({ stockEarnings: res });
+        });
+
         if (this.state.searching === true) {
-          this.setState({ searching: false, ticker: [data] });
+          this.setState({ searching: false });
         } else {
-          this.setState({ searching: true, ticker: [data] });
+          this.setState({ searching: true });
         }
       }
     }
 }
 
-function StockInfoBox(props) {
-    return (<h1>{props.ticker[0]}</h1>);
+function StockDataBox(props) {
+  console.log(props);
+  return (<h1>{"STONKS"}</h1>);
 }
 
 export default SearchBar;
