@@ -15,7 +15,7 @@ deploy web app using [heroku](https://www.freecodecamp.org/news/how-to-create-a-
 * style with tailwindCSS
 * cleanup the UI
 
-# FEATURE TO ADD
+# FEATURES TO ADD
 * Growth graph
 * Compare two stocks
 * Watch stock
