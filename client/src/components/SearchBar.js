@@ -115,8 +115,47 @@ class SearchBar extends React.Component {
 }
 
 function StockDataBox(props) {
-  console.log(props);
-  return (<h1>{"STONKS"}</h1>);
+  var stock = undefined;
+  var yearlyEPS = 0;
+  var averageSharePrice = 0;
+  var count = 0;
+  for (let obj in props.stockData.data) {
+    if (obj === "Time Series (Daily)") {
+      stock = Object.values(Object.values(props.stockData.data[obj]).reverse()).pop();
+    }
+  }
+  for (let obj in props.stockEarnings.data) {
+    if (obj === "annualEarnings") {
+      yearlyEPS = Object.values(props.stockEarnings.data[obj]).sort(function (a,b) {return new Date(a.fiscalDateEnding) - new Date(b.fiscalDateEnding);}).pop().reportedEPS;
+    }
+  }
+  if (stock !== undefined) {
+    for (const [key, value] of Object.entries(stock)) {
+      if (key !== "5. volume") {
+        averageSharePrice = averageSharePrice + Number(value);
+        count = count + 1;
+      }
+    }
+  }
+
+  averageSharePrice = averageSharePrice / count;
+  console.log(averageSharePrice);
+  console.log(yearlyEPS);
+
+  if (averageSharePrice !== NaN && yearlyEPS !== NaN) {
+    return (
+            <div>
+              <h2>{averageSharePrice}</h2>
+              <h2>{yearlyEPS}</h2>
+            </div>
+          );
+  } else {
+    return (
+            <div>
+              <h2>hello dude</h2>
+            </div>
+          );
+  }
 }
 
 export default SearchBar;
