@@ -82,7 +82,8 @@ class SearchBar extends React.Component {
                         onChange={this.handleChange}
                         onKeyDown={this.onEnterSearch}
                     />
-                    <StockDataBox stockData={this.state.stockData} stockEarnings={this.state.stockEarnings} />
+                    {(this.state.searching === true && this.state.stockData !== undefined && this.state.stockEarnings !== undefined) && 
+                      <StockDataBox stockData={this.state.stockData} stockEarnings={this.state.stockEarnings} />}
                 </div>
             </div>
         );
@@ -94,21 +95,18 @@ class SearchBar extends React.Component {
 
     async onEnterSearch(e) {
       if (e.key === "Enter") {
-       
-        await getStock(e.target.value)
-        .then((res) => {
-          this.setState({ stockData: res })
-        });
-
-        await getStockEarnings(e.target.value)
-        .then((res) => {
-          this.setState({ stockEarnings: res });
-        });
-
-        if (this.state.searching === true) {
-          this.setState({ searching: false });
-        } else {
+        if (e.target.value !== '') { 
+          await getStock(e.target.value)
+                .then((res) => {
+                  this.setState({ stockData: res })
+                });
+          await getStockEarnings(e.target.value)
+                .then((res) => {
+                  this.setState({ stockEarnings: res });
+                });
           this.setState({ searching: true });
+        } else {
+          this.setState({ searching: false });
         }
       }
     }
@@ -118,6 +116,8 @@ function StockDataBox(props) {
   var stock = undefined;
   var yearlyEPS = 0;
   var averageSharePrice = 0;
+  var ppeRatio = 0;
+  var earningsRatio = 0;
   var count = 0;
   for (let obj in props.stockData.data) {
     if (obj === "Time Series (Daily)") {
@@ -138,23 +138,23 @@ function StockDataBox(props) {
     }
   }
 
-  averageSharePrice = averageSharePrice / count;
-  console.log(averageSharePrice);
-  console.log(yearlyEPS);
+  averageSharePrice = Math.round((averageSharePrice / count) * 100) / 100;
+  ppeRatio = Math.round((averageSharePrice / yearlyEPS) * 100) / 100;
+  earningsRatio = Math.round((yearlyEPS / averageSharePrice) * 100) / 100;
 
-  if (averageSharePrice !== NaN && yearlyEPS !== NaN) {
+  if (!isNaN(averageSharePrice) && !isNaN(yearlyEPS)) {
     return (
-            <div>
-              <h2>{averageSharePrice}</h2>
-              <h2>{yearlyEPS}</h2>
-            </div>
-          );
-  } else {
-    return (
-            <div>
-              <h2>hello dude</h2>
-            </div>
-          );
+          <div className="grid grid-cols-4 gap-10 gap-y-0">
+            <div className="antialiased text-blue">share price</div>
+            <div className="antialiased text-blue">earnings per share</div>
+            <div className="antialiased text-blue">ppe ratio</div>
+            <div className="antialiased text-blue">earnings yield</div>
+            <div className="antialiased text-blue">{averageSharePrice}</div>
+            <div className="antialiased text-blue">{yearlyEPS}</div>
+            <div className="antialiased text-blue">{ppeRatio}</div>
+            <div className="antialiased text-blue">{earningsRatio}</div>
+          </div>
+        );
   }
 }
 

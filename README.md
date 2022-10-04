@@ -12,4 +12,11 @@ integrate API calls to [EDGAR](https://www.sec.gov/cgi-bin/browse-edgar?company=
 
 deploy web app using [heroku](https://www.freecodecamp.org/news/how-to-create-a-react-app-with-a-node-backend-the-complete-guide/)
 
-style with tailwindCSS
+* style with tailwindCSS
+* cleanup the UI
+
+# FEATURE TO ADD
+* Growth graph
+* Compare two stocks
+* Watch stock
+* Adding routing for pages
